@@ -1,0 +1,247 @@
+{
+  "rules": [
+    {
+      "id": 1,
+      "ruleType": "BLOCKED_EXPENSE",
+      "createdAt": "2025-11-09T00:00:00.000+00:00",
+      "ruleData": {
+        "expenseType": "ENTERTAINMENT"
+      }
+    },
+    {
+      "id": 2,
+      "ruleType": "AMOUNT_MAX_THRESHOLD",
+      "createdAt": "2025-11-09T00:00:00.000+00:00",
+      "ruleData": {
+        "maxThreshold": {
+          "currency": "INR",
+          "amount": 5000
+        }
+      }
+    },
+    {
+      "id": 3,
+      "ruleType": "SELLER_TYPE_MAX_THRESHOLD",
+      "createdAt": "2025-11-09T00:00:00.000+00:00",
+      "ruleData": {
+        "sellerType": "RESTAURANT",
+        "maxThreshold": {
+          "currency": "INR",
+          "amount": 3000
+        }
+      }
+    }
+  ],
+  "expenses": [
+    {
+      "id": "EXP001",
+      "itemId": "ITEM001",
+      "expenseType": "FOOD",
+      "price": {
+        "currency": "INR",
+        "amount": 3500
+      },
+      "seller": {
+        "sellerType": "RESTAURANT",
+        "sellerName": "Fine Dining Restaurant"
+      }
+    },
+    {
+      "id": "EXP002",
+      "itemId": "ITEM002",
+      "expenseType": "ENTERTAINMENT",
+      "price": {
+        "currency": "INR",
+        "amount": 2000
+      },
+      "seller": {
+        "sellerType": "HOTEL",
+        "sellerName": "Grand Hotel"
+      }
+    },
+    {
+      "id": "EXP003",
+      "itemId": "ITEM003",
+      "expenseType": "TRAVEL",
+      "price": {
+        "currency": "INR",
+        "amount": 8000
+      },
+      "seller": {
+        "sellerType": "TRAVEL_AGENCY",
+        "sellerName": "Travel World"
+      }
+    },
+    {
+      "id": "EXP004",
+      "itemId": "ITEM004",
+      "expenseType": "FOOD",
+      "price": {
+        "currency": "INR",
+        "amount": 2000
+      },
+      "seller": {
+        "sellerType": "RESTAURANT",
+        "sellerName": "Local Cafe"
+      }
+    },
+    {
+      "id": "EXP005",
+      "itemId": "ITEM005",
+      "expenseType": "LEARNING_AND_DEVELOPMENT",
+      "price": {
+        "currency": "INR",
+        "amount": 4000
+      },
+      "seller": {
+        "sellerType": "LEARNING_PLATFORM",
+        "sellerName": "Online Course Platform"
+      }
+    }
+  ],
+
+  "_comment_validation_tests": "========== COPY THESE TO TEST EDGE CASES ==========",
+
+  "edgeCase1_BlockedExpense_with_WrongData": {
+    "description": "RuleType says BLOCKED_EXPENSE but ruleData has maxThreshold (wrong structure)",
+    "whatHappens": "Strategy converts to BlockedExpense, expenseType becomes null, comparison fails",
+    "rules": [
+      {
+        "id": 1,
+        "ruleType": "BLOCKED_EXPENSE",
+        "createdAt": "2025-11-09T00:00:00.000+00:00",
+        "ruleData": {
+          "maxThreshold": {
+            "currency": "INR",
+            "amount": 5000
+          }
+        }
+      }
+    ],
+    "expenses": [
+      {
+        "id": "EXP001",
+        "itemId": "ITEM001",
+        "expenseType": "ENTERTAINMENT",
+        "price": {"currency": "INR", "amount": 2000},
+        "seller": {"sellerType": "HOTEL", "sellerName": "Grand Hotel"}
+      }
+    ]
+  },
+
+  "edgeCase2_AmountThreshold_with_WrongData": {
+    "description": "RuleType says AMOUNT_MAX_THRESHOLD but ruleData has expenseType (wrong structure)",
+    "whatHappens": "Strategy converts to AmountMaxThreshold, maxThreshold becomes null, NullPointerException",
+    "rules": [
+      {
+        "id": 2,
+        "ruleType": "AMOUNT_MAX_THRESHOLD",
+        "createdAt": "2025-11-09T00:00:00.000+00:00",
+        "ruleData": {
+          "expenseType": "ENTERTAINMENT"
+        }
+      }
+    ],
+    "expenses": [
+      {
+        "id": "EXP001",
+        "itemId": "ITEM001",
+        "expenseType": "FOOD",
+        "price": {"currency": "INR", "amount": 3500},
+        "seller": {"sellerType": "RESTAURANT", "sellerName": "Test"}
+      }
+    ]
+  },
+
+  "edgeCase3_SellerThreshold_with_WrongData": {
+    "description": "RuleType says SELLER_TYPE_MAX_THRESHOLD but ruleData has only expenseType (wrong structure)",
+    "whatHappens": "Both sellerType and maxThreshold become null, NullPointerException",
+    "rules": [
+      {
+        "id": 3,
+        "ruleType": "SELLER_TYPE_MAX_THRESHOLD",
+        "createdAt": "2025-11-09T00:00:00.000+00:00",
+        "ruleData": {
+          "expenseType": "ENTERTAINMENT"
+        }
+      }
+    ],
+    "expenses": [
+      {
+        "id": "EXP001",
+        "itemId": "ITEM001",
+        "expenseType": "FOOD",
+        "price": {"currency": "INR", "amount": 3500},
+        "seller": {"sellerType": "RESTAURANT", "sellerName": "Test"}
+      }
+    ]
+  },
+
+  "edgeCase4_DifferentCurrencies": {
+    "description": "Rule threshold in USD but expense in INR",
+    "whatHappens": "Throws 'Cannot compare prices with different currencies'",
+    "rules": [
+      {
+        "id": 2,
+        "ruleType": "AMOUNT_MAX_THRESHOLD",
+        "createdAt": "2025-11-09T00:00:00.000+00:00",
+        "ruleData": {
+          "maxThreshold": {"currency": "USD", "amount": 100}
+        }
+      }
+    ],
+    "expenses": [
+      {
+        "id": "EXP001",
+        "itemId": "ITEM001",
+        "expenseType": "FOOD",
+        "price": {"currency": "INR", "amount": 3500},
+        "seller": {"sellerType": "RESTAURANT", "sellerName": "Test"}
+      }
+    ]
+  },
+
+  "edgeCase5_NullRuleData": {
+    "description": "ruleData is completely null",
+    "whatHappens": "ObjectMapper.convertValue with null will cause error",
+    "rules": [
+      {
+        "id": 1,
+        "ruleType": "BLOCKED_EXPENSE",
+        "createdAt": "2025-11-09T00:00:00.000+00:00",
+        "ruleData": null
+      }
+    ],
+    "expenses": [
+      {
+        "id": "EXP001",
+        "itemId": "ITEM001",
+        "expenseType": "ENTERTAINMENT",
+        "price": {"currency": "INR", "amount": 2000},
+        "seller": {"sellerType": "HOTEL", "sellerName": "Test"}
+      }
+    ]
+  },
+
+  "edgeCase6_EmptyRuleData": {
+    "description": "ruleData is empty object {}",
+    "whatHappens": "All fields in converted object will be null",
+    "rules": [
+      {
+        "id": 1,
+        "ruleType": "BLOCKED_EXPENSE",
+        "createdAt": "2025-11-09T00:00:00.000+00:00",
+        "ruleData": {}
+      }
+    ],
+    "expenses": [
+      {
+        "id": "EXP001",
+        "itemId": "ITEM001",
+        "expenseType": "ENTERTAINMENT",
+        "price": {"currency": "INR", "amount": 2000},
+        "seller": {"sellerType": "HOTEL", "sellerName": "Test"}
+      }
+    ]
+  }
+}

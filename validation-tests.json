@@ -1,0 +1,219 @@
+{
+  "_description": "Validation Test Cases - Copy the 'body' and paste in Postman to test",
+  
+  "test1_mismatchedTypeAndData_BlockedExpense_with_AmountData": {
+    "description": "RuleType=BLOCKED_EXPENSE but ruleData has AmountMaxThreshold structure",
+    "expectedBehavior": "ObjectMapper will convert to BlockedExpense, expenseType will be null, causes error",
+    "endpoint": "POST http://localhost:8080/api/apply",
+    "body": {
+      "rules": [
+        {
+          "id": 1,
+          "ruleType": "BLOCKED_EXPENSE",
+          "createdAt": "2025-11-09T00:00:00.000+00:00",
+          "ruleData": {
+            "maxThreshold": {
+              "currency": "INR",
+              "amount": 5000
+            }
+          }
+        }
+      ],
+      "expenses": [
+        {
+          "id": "EXP001",
+          "itemId": "ITEM001",
+          "expenseType": "ENTERTAINMENT",
+          "price": {"currency": "INR", "amount": 2000},
+          "seller": {"sellerType": "HOTEL", "sellerName": "Test Hotel"}
+        }
+      ]
+    }
+  },
+
+  "test2_mismatchedTypeAndData_AmountThreshold_with_BlockedData": {
+    "description": "RuleType=AMOUNT_MAX_THRESHOLD but ruleData has BlockedExpense structure",
+    "expectedBehavior": "ObjectMapper will convert to AmountMaxThreshold, maxThreshold will be null, causes NullPointerException",
+    "endpoint": "POST http://localhost:8080/api/apply",
+    "body": {
+      "rules": [
+        {
+          "id": 2,
+          "ruleType": "AMOUNT_MAX_THRESHOLD",
+          "createdAt": "2025-11-09T00:00:00.000+00:00",
+          "ruleData": {
+            "expenseType": "ENTERTAINMENT"
+          }
+        }
+      ],
+      "expenses": [
+        {
+          "id": "EXP001",
+          "itemId": "ITEM001",
+          "expenseType": "FOOD",
+          "price": {"currency": "INR", "amount": 3500},
+          "seller": {"sellerType": "RESTAURANT", "sellerName": "Test"}
+        }
+      ]
+    }
+  },
+
+  "test3_mismatchedTypeAndData_SellerThreshold_with_BlockedData": {
+    "description": "RuleType=SELLER_TYPE_MAX_THRESHOLD but ruleData has BlockedExpense structure",
+    "expectedBehavior": "Both sellerType and maxThreshold will be null, causes NullPointerException",
+    "endpoint": "POST http://localhost:8080/api/apply",
+    "body": {
+      "rules": [
+        {
+          "id": 3,
+          "ruleType": "SELLER_TYPE_MAX_THRESHOLD",
+          "createdAt": "2025-11-09T00:00:00.000+00:00",
+          "ruleData": {
+            "expenseType": "ENTERTAINMENT"
+          }
+        }
+      ],
+      "expenses": [
+        {
+          "id": "EXP001",
+          "itemId": "ITEM001",
+          "expenseType": "FOOD",
+          "price": {"currency": "INR", "amount": 3500},
+          "seller": {"sellerType": "RESTAURANT", "sellerName": "Test"}
+        }
+      ]
+    }
+  },
+
+  "test4_nullExpensePrice": {
+    "description": "Expense has null price",
+    "expectedBehavior": "NullPointerException when comparing prices",
+    "endpoint": "POST http://localhost:8080/api/apply",
+    "body": {
+      "rules": [
+        {
+          "id": 2,
+          "ruleType": "AMOUNT_MAX_THRESHOLD",
+          "createdAt": "2025-11-09T00:00:00.000+00:00",
+          "ruleData": {
+            "maxThreshold": {"currency": "INR", "amount": 5000}
+          }
+        }
+      ],
+      "expenses": [
+        {
+          "id": "EXP001",
+          "itemId": "ITEM001",
+          "expenseType": "FOOD",
+          "price": null,
+          "seller": {"sellerType": "RESTAURANT", "sellerName": "Test"}
+        }
+      ]
+    }
+  },
+
+  "test5_negativePriceAmount": {
+    "description": "Negative amount in expense price",
+    "expectedBehavior": "Should process normally (no validation), might cause issues in comparison",
+    "endpoint": "POST http://localhost:8080/api/apply",
+    "body": {
+      "rules": [
+        {
+          "id": 2,
+          "ruleType": "AMOUNT_MAX_THRESHOLD",
+          "createdAt": "2025-11-09T00:00:00.000+00:00",
+          "ruleData": {
+            "maxThreshold": {"currency": "INR", "amount": 5000}
+          }
+        }
+      ],
+      "expenses": [
+        {
+          "id": "EXP001",
+          "itemId": "ITEM001",
+          "expenseType": "FOOD",
+          "price": {"currency": "INR", "amount": -500},
+          "seller": {"sellerType": "RESTAURANT", "sellerName": "Test"}
+        }
+      ]
+    }
+  },
+
+  "test6_emptyExpenseId": {
+    "description": "Empty string for expense ID",
+    "expectedBehavior": "Should process normally (no validation)",
+    "endpoint": "POST http://localhost:8080/api/apply",
+    "body": {
+      "rules": [
+        {
+          "id": 1,
+          "ruleType": "BLOCKED_EXPENSE",
+          "createdAt": "2025-11-09T00:00:00.000+00:00",
+          "ruleData": {"expenseType": "ENTERTAINMENT"}
+        }
+      ],
+      "expenses": [
+        {
+          "id": "",
+          "itemId": "ITEM001",
+          "expenseType": "ENTERTAINMENT",
+          "price": {"currency": "INR", "amount": 2000},
+          "seller": {"sellerType": "HOTEL", "sellerName": "Test"}
+        }
+      ]
+    }
+  },
+
+  "test7_nullExpenseType": {
+    "description": "Null expense type in expense",
+    "expectedBehavior": "NullPointerException when comparing expense types",
+    "endpoint": "POST http://localhost:8080/api/apply",
+    "body": {
+      "rules": [
+        {
+          "id": 1,
+          "ruleType": "BLOCKED_EXPENSE",
+          "createdAt": "2025-11-09T00:00:00.000+00:00",
+          "ruleData": {"expenseType": "ENTERTAINMENT"}
+        }
+      ],
+      "expenses": [
+        {
+          "id": "EXP001",
+          "itemId": "ITEM001",
+          "expenseType": null,
+          "price": {"currency": "INR", "amount": 2000},
+          "seller": {"sellerType": "HOTEL", "sellerName": "Test"}
+        }
+      ]
+    }
+  },
+
+  "test8_differentCurrencies": {
+    "description": "Rule and expense have different currencies",
+    "expectedBehavior": "Should throw 'Cannot compare prices with different currencies'",
+    "endpoint": "POST http://localhost:8080/api/apply",
+    "body": {
+      "rules": [
+        {
+          "id": 2,
+          "ruleType": "AMOUNT_MAX_THRESHOLD",
+          "createdAt": "2025-11-09T00:00:00.000+00:00",
+          "ruleData": {
+            "maxThreshold": {"currency": "USD", "amount": 5000}
+          }
+        }
+      ],
+      "expenses": [
+        {
+          "id": "EXP001",
+          "itemId": "ITEM001",
+          "expenseType": "FOOD",
+          "price": {"currency": "INR", "amount": 3500},
+          "seller": {"sellerType": "RESTAURANT", "sellerName": "Test"}
+        }
+      ]
+    }
+  }
+}
+

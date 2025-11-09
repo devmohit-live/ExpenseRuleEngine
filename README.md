@@ -24,3 +24,12 @@ List of rules similar to
 Run the rules on expense and flag the rule which do not satisfy. Implement following:
 
 `evaluateRule(List<rule> , List<expense>)`
+
+
+Debug/Run Snapshots:
+
+![debug state 1.png](src/main/resources/images/debug%20state%201.png)
+![debug state 2.png](src/main/resources/images/debug%20state%202.png)
+![debug state 3.png](src/main/resources/images/debug%20state%203.png)
+![happy path.png](src/main/resources/images/happy%20path.png)
+![validatio check.png](src/main/resources/images/validatio%20check.png)
